@@ -1,50 +1,20 @@
 <?php
 defined('_JEXEC') or die;
+use Joomla\CMS\Plugin\CMSPlugin;
+class plgSystemTask extends CMSPlugin {
 
-use BadMethodCallException;
-use Joomla\CMS\Event\AbstractImmutableEvent;
-use Joomla\CMS\Table\TableInterface;
-
-/**
- * Event class for an event
- */
-class MyCustomEvent extends AbstractImmutableEvent
+public function __construct($name, array $argumens = array())
 {
-	/**
-	 * Constructor.
-	 *
-	 * @param   string  $name       The event name.
-	 * @param   array   $arguments  The event arguments.
-	 *
-	 * @throws  BadMethodCallException
-	 */
-	public function __construct($name, array $arguments = array())
-	{
-		if (!array_key_exists('myProperty', $arguments))
-		{
-			throw new BadMethodCallException("Argument 'myProperty' is required for event $name");
-		}
-
-		parent::__construct($name, $arguments);
-	}
-
-	/**
-	 * Setter for the myProperty argument
-	 *
-	 * @param   mixed  $value  The value to set
-	 *
-	 * @return  mixed
-	 *
-	 * @throws  BadMethodCallException  if the argument is not of the expected type
-	 */
-	protected function setMyProperty($value)
-	{
-		if (!empty($value) && !is_object($value) && !is_array($value))
-		{
-			throw new BadMethodCallException("Argument 'src' of event {$this->name} must be empty, object or array");
-		}
-
-		return $value;
-	}
+    parent::__construct($name, $arguments);
+    
 }
-?>
+public function onAfterDispatch(){
+    $app = JFactory::getapplication();
+    $isAdmin = $app->isClient('administrator');
+    $heading_text = $this->params->get('heading_text', 1);
+    if ($isAdmin) {
+        JFactory::getDocument()->addScriptDeclaration("var page_task_container.innerHTML= '$heading_text' ");
+        return;
+    }
+}
+}
